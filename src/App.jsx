@@ -9,9 +9,18 @@ function Square({value, onSquareClick}){
 function Board() {
   const [xIsNext, setXIsNext]=useState(true);
   const [squares, setSquares]=useState(Array(9).fill(null))
+  // Winner
+  const winner = calculateWinner(squares);
+  let status;
+  if (winner) {
+    status = "Winner: " + winner;
+  } else {
+    status = "Next player: " + (xIsNext ? "X" : "O");
+  }
+  // end of winner
   const handleClick = (i)=>{
-    if(squares[i]!=null){
-      console.log(squares[i])
+    isFilled(squares, setSquares)
+    if(squares[i] || calculateWinner(squares)){
       return;
     }
     const nextSquares = squares.slice();
@@ -25,7 +34,8 @@ function Board() {
     setXIsNext(!xIsNext);
   };
   return (
-    <>
+    <div className='cont'>
+      <div className="status"> {status} </div>
       <div className="board-row">
         <Square 
         value={squares[0]}
@@ -60,8 +70,37 @@ function Board() {
         value={squares[8]}
         onSquareClick={()=>handleClick(8)}/>
       </div>
-    </>
+    </div>
   )
 }
 
 export default Board
+
+
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
+
+function isFilled(squares, setSquares){
+  const xFilled =squares.every((element)=>element !==undefined && element!==null);
+    if(xFilled && !calculateWinner(squares)){
+      alert("No winner")
+      setSquares(Array(9).fill(null))
+    }
+}
